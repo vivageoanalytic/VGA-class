@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "outDir": "dist-server",
+    "rootDir": ".",
+    "types": ["node"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+  },
+  "include": [
+    "api/**/*.ts",
+    "src/content/mentors.ts",
+    "src/types/schedule.ts",
+    "src/utils/dateTime.ts"
+  ]
+}
