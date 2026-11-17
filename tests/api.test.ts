@@ -412,6 +412,21 @@ describe("Kontrak API publik", () => {
     expect(response.status).toBe(429);
     expect(response.headers.get("Retry-After")).toBe("60");
   });
+  it("Menolak query terlalu panjang dan nilai mentor kosong", async () => {
+    expect(
+      (
+        await handler()(
+          request(`weekStart=${week}&mentorId=${"x".repeat(300)}`),
+        )
+      ).status,
+    ).toBe(400);
+    expect(
+      (await handler()(request(`weekStart=${week}&mentorId=`))).status,
+    ).toBe(400);
+    expect(
+      (await handler()(new Request("http://localhost/api/unknown"))).status,
+    ).toBe(404);
+  });
   it("Limiter reset setelah window berlalu", () => {
     let time = now;
     const limiter = createRateLimiter(2, 60_000, () => time);

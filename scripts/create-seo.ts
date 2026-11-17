@@ -2,13 +2,14 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { loadEnv } from "vite";
 import { pageMeta } from "../src/router/meta.ts";
+import { safeSiteOrigin } from "../src/utils/urls.ts";
 
 const env = {
   ...loadEnv("production", process.cwd(), "VITE_"),
   ...process.env,
 };
-const site = (env.VITE_SITE_URL || "").replace(/\/$/, "");
-const validSite = /^https:\/\/[^/<>"\s]+$/.test(site);
+const site = safeSiteOrigin(env.VITE_SITE_URL);
+const validSite = !!site;
 const indexable =
   validSite &&
   env.VITE_SITE_INDEXABLE === "true" &&

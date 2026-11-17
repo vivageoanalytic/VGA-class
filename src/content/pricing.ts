@@ -22,6 +22,7 @@ export const packages = [
   {
     id: "single",
     name: "Paket Satuan",
+    sessionLabel: "1 sesi · fleksibel",
     unit: "per mahasiswa / per sesi",
     detail: "90 atau 120 menit · online / offline",
     notes: [
@@ -34,6 +35,7 @@ export const packages = [
   {
     id: "routine",
     name: "Paket Rutin",
+    sessionLabel: "8 sesi belajar",
     unit: "per mahasiswa / paket 8 sesi",
     detail: "8 × 90 atau 120 menit · online / offline",
     notes: [
@@ -47,6 +49,7 @@ export const packages = [
   {
     id: "practice",
     name: "Latihan Soal Mandiri",
+    sessionLabel: "4 × 120 menit · offline",
     unit: "per mahasiswa / paket 4 sesi",
     detail: "4 × 120 menit · khusus offline",
     notes: [

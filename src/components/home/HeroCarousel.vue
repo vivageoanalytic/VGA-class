@@ -207,12 +207,11 @@ onBeforeUnmount(() => {
   display: block;
 }
 .outline-title {
-  -webkit-text-stroke: 1.5px var(--color-brand);
-  color: transparent;
+  color: var(--color-brand);
 }
 .hero-copy p {
   max-width: 420px;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--color-muted);
 }
 .hero-actions {
@@ -223,7 +222,7 @@ onBeforeUnmount(() => {
 }
 .hero-mini {
   color: var(--color-muted);
-  font-size: 10px;
+  font-size: 14px;
   line-height: 1.6;
 }
 .hero-mini strong {
@@ -239,7 +238,7 @@ onBeforeUnmount(() => {
   border-top: 1px solid var(--color-line);
 }
 .hero-edition {
-  font-size: 9px;
+  font-size: 14px;
   letter-spacing: 0.12em;
   font-weight: 600;
 }
@@ -253,7 +252,7 @@ onBeforeUnmount(() => {
   gap: 8px;
 }
 .slide-count {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
   margin-right: 18px;
 }
@@ -283,12 +282,12 @@ onBeforeUnmount(() => {
   display: flex;
   gap: 12px;
   align-items: center;
-  font-size: 8px;
+  font-size: 13px;
   color: var(--color-muted);
   letter-spacing: 0.08em;
 }
 .art-label .badge {
-  font-size: 8px;
+  font-size: 13px;
 }
 .hero-strip {
   background: var(--color-accent);
@@ -305,7 +304,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -357,7 +356,7 @@ onBeforeUnmount(() => {
     margin: 22px 0;
   }
   .hero-copy p {
-    font-size: 13px;
+    font-size: 16px;
     max-width: 320px;
   }
   .hero-art {
@@ -372,22 +371,22 @@ onBeforeUnmount(() => {
     margin-top: 24px;
   }
   .hero-mini {
-    font-size: 9px;
+    font-size: 14px;
   }
   .hero-actions .button {
     padding-inline: 17px;
-    font-size: 12px;
+    font-size: 15px;
   }
   .hero-bottom {
     margin-top: 240px;
   }
   .hero-edition {
-    font-size: 7px;
+    font-size: 13px;
     max-width: 140px;
   }
   .slide-count {
     margin-right: 4px;
-    font-size: 10px;
+    font-size: 14px;
   }
   .hero-controls {
     gap: 4px;
@@ -408,7 +407,7 @@ onBeforeUnmount(() => {
     padding-block: 18px;
   }
   .hero-strip .container > span {
-    font-size: 8px;
+    font-size: 13px;
     gap: 6px;
   }
   .strip-star {

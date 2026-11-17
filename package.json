@@ -9,20 +9,30 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "dev:api": "tsc -p tsconfig.server.json && node --watch --env-file-if-exists=.env dist-server/api/server.js",
-    "build": "vue-tsc --noEmit && vite build && node --experimental-strip-types scripts/create-seo.ts && tsc -p tsconfig.server.json",
+    "build": "vue-tsc --noEmit && vite build && node --experimental-strip-types scripts/create-seo.ts && tsc -p tsconfig.server.json && npm run security:check",
     "preview": "vite preview --host 127.0.0.1",
     "start": "node --env-file-if-exists=.env dist-server/api/server.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "assets": "node scripts/create-assets.mjs"
+    "security:check": "node --experimental-strip-types scripts/check-security.ts",
+    "assets": "node scripts/create-assets.mjs",
+    "assets:brand": "node scripts/create-brand-assets.mjs"
   },
   "dependencies": {
-    "@fontsource/barlow-condensed": "^5.2.7",
-    "@fontsource/dm-sans": "^5.2.6",
+    "@fontsource-variable/league-gothic": "^5.3.0",
+    "@fontsource/lato": "^5.3.0",
     "lucide-vue-next": "^0.468.0",
     "vue": "^3.5.24",
     "vue-router": "^4.6.3"
+  },
+  "overrides": {
+    "js-beautify": {
+      "glob": "14.0.2",
+      "editorconfig": {
+        "minimatch": "11.0.1"
+      }
+    }
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
@@ -30,10 +40,10 @@
     "@tailwindcss/vite": "^4.1.17",
     "@types/node": "^24.10.0",
     "@vitejs/plugin-vue": "^6.0.2",
-    "@vue/test-utils": "^2.4.6",
+    "@vue/test-utils": "2.4.6",
     "jsdom": "^27.2.0",
     "prettier": "^3.10.1",
-    "sharp": "^0.34.5",
+    "sharp": "0.35.5",
     "tailwindcss": "^4.1.17",
     "typescript": "~5.9.3",
     "vite": "^7.2.2",

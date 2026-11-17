@@ -92,13 +92,13 @@ import MentorCard from "../components/mentors/MentorCard.vue";
   color: var(--color-brand);
 }
 .mentor-process h3 {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   margin-bottom: 10px;
 }
 .mentor-process li p {
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 16px;
 }
 @media (max-width: 767px) {
   .mentors-grid {
@@ -121,7 +121,7 @@ import MentorCard from "../components/mentors/MentorCard.vue";
     font-size: 23px;
   }
   .mentors-grid :deep(.mentor-content p) {
-    font-size: 10px;
+    font-size: 14px;
   }
 }
 </style>

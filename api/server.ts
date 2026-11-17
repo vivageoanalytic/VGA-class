@@ -1,21 +1,25 @@
 import { createServer } from "node:http";
-import { readFile, stat } from "node:fs/promises";
+import { readFile, realpath, stat } from "node:fs/promises";
 import { resolve, extname, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { readCalendarConfig, createCalendarService } from "./googleCalendar.js";
+import { createScheduleService } from "./scheduleService.js";
 import { createPublicScheduleHandler } from "./publicSchedule.js";
+import { createCalendarNotifications } from "./calendarNotifications.js";
+import { securityHeaders } from "./securityHeaders.js";
+import { isSafePublicPath } from "./staticPolicy.js";
+import { safeSiteOrigin } from "../src/utils/urls.js";
 
 const here = fileURLToPath(new URL(".", import.meta.url));
 const root = here.includes(`${sep}dist-server${sep}`)
   ? resolve(here, "../..")
   : resolve(here, "..");
 const dist = resolve(root, "dist");
-const schedule = createPublicScheduleHandler(
-  createCalendarService(readCalendarConfig(process.env), {
-    onSyncError: (mentorId) =>
-      console.warn(JSON.stringify({ event: "schedule_sync_failed", mentorId })),
-  }),
-);
+const calendarService = createScheduleService(process.env, {
+  onSyncError: (mentorId) =>
+    console.warn(JSON.stringify({ event: "schedule_sync_failed", mentorId })),
+});
+const schedule = createPublicScheduleHandler(calendarService);
+const notifications = createCalendarNotifications(calendarService, process.env);
 const port = Number(process.env.PORT || 3001),
   host = process.env.HOST || "127.0.0.1";
 const types: Record<string, string> = {
@@ -23,38 +27,38 @@ const types: Record<string, string> = {
   ".js": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
   ".png": "image/png",
   ".webp": "image/webp",
   ".woff": "font/woff",
   ".woff2": "font/woff2",
   ".txt": "text/plain; charset=utf-8",
   ".xml": "application/xml; charset=utf-8",
+  ".pdf": "application/pdf",
 };
 const paths = ["/", "/programs", "/mentors", "/schedule", "/gallery"];
 const indexable =
   process.env.SITE_INDEXABLE === "true" &&
   process.env.VITE_SITE_INDEXABLE === "true" &&
   process.env.VITE_SCHEDULE_DEMO === "false" &&
-  /^https:\/\/[^/]+\/?$/.test(process.env.VITE_SITE_URL || "");
-const siteUrl = (process.env.VITE_SITE_URL || "").replace(/\/$/, "");
+  !!safeSiteOrigin(process.env.VITE_SITE_URL);
+const siteUrl = safeSiteOrigin(process.env.VITE_SITE_URL);
 const xmlEscape = (value: string) =>
   value
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll('"', "&quot;");
 const server = createServer(async (req, res) => {
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-  res.setHeader(
-    "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=()",
-  );
-  res.setHeader(
-    "Content-Security-Policy",
-    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'",
-  );
+  for (const [name, value] of Object.entries(securityHeaders))
+    res.setHeader(name, value);
+  if ((req.url?.length ?? 0) > 2048) {
+    res.writeHead(414);
+    res.end("Alamat permintaan terlalu panjang.");
+    return;
+  }
   try {
     const url = new URL(req.url || "/", "http://localhost");
+    if (await notifications(req, res)) return;
     if (url.pathname === "/api/public-schedule") {
       const forwarded =
         process.env.TRUST_PROXY === "true"
@@ -95,7 +99,19 @@ const server = createServer(async (req, res) => {
       );
       return;
     }
-    const decoded = decodeURIComponent(url.pathname);
+    let decoded: string;
+    try {
+      decoded = decodeURIComponent(url.pathname);
+    } catch {
+      res.writeHead(400);
+      res.end("Alamat permintaan tidak valid.");
+      return;
+    }
+    if (!isSafePublicPath(decoded)) {
+      res.writeHead(404);
+      res.end("Halaman tidak ditemukan.");
+      return;
+    }
     const candidate = resolve(dist, `.${decoded}`);
     if (!candidate.startsWith(dist + sep) && candidate !== dist) {
       res.writeHead(403);
@@ -127,7 +143,16 @@ const server = createServer(async (req, res) => {
         file = resolve(dist, "index.html");
       }
     }
-    let body: Buffer | string = await readFile(file);
+    const [realFile, realDist] = await Promise.all([
+      realpath(file),
+      realpath(dist),
+    ]);
+    if (!realFile.startsWith(realDist + sep)) {
+      res.writeHead(404);
+      res.end();
+      return;
+    }
+    let body: Buffer | string = await readFile(realFile);
     const html = extname(file) === ".html";
     const known = paths.includes(url.pathname);
     if (html) {

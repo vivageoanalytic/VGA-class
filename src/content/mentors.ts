@@ -9,6 +9,12 @@ export interface Mentor {
   demo: boolean;
   publicationApproved: boolean;
   experience?: string;
+  /** Public information only; never put private pending biodata in a client-side config. */
+  fullName?: string;
+  introduction?: string;
+  education?: { institution: string; program: string; degree?: string }[];
+  cvUrl?: string | null;
+  cvPublicationApproved?: boolean;
 }
 
 export const mentors: Mentor[] = Array.from({ length: 5 }, (_, i) => ({
@@ -21,6 +27,11 @@ export const mentors: Mentor[] = Array.from({ length: 5 }, (_, i) => ({
   active: true,
   demo: true,
   publicationApproved: false,
+  fullName: undefined,
+  introduction: undefined,
+  education: [],
+  cvUrl: null,
+  cvPublicationApproved: false,
 }));
 
 export const activeMentors = mentors.filter(

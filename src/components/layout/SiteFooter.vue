@@ -29,9 +29,18 @@ import WhatsAppCTA from "../shared/WhatsAppCTA.vue";
     </div>
     <div class="container footer-bottom">
       <div class="footer-brand">
-        <RouterLink to="/" class="display">VGA CLASS<span>↗</span></RouterLink>
+        <RouterLink to="/" aria-label="VGA Class, beranda"
+          ><picture
+            ><source :srcset="brand.logo.src" type="image/webp" />
+            <img
+              class="footer-logo"
+              :src="brand.logo.fallback"
+              :alt="brand.logo.alt"
+              :width="brand.logo.width"
+              :height="brand.logo.height"
+              loading="lazy" /></picture
+        ></RouterLink>
         <p>Belajar untuk memahami.</p>
-        <span class="small">Identitas visual sementara.</span>
       </div>
       <nav aria-label="Navigasi footer">
         <RouterLink v-for="item in navigation" :key="item.to" :to="item.to"
@@ -42,11 +51,14 @@ import WhatsAppCTA from "../shared/WhatsAppCTA.vue";
         <span>Kalkulus 1 & Kalkulus 2</span
         ><span>Online & offline · untuk mahasiswa</span
         ><span>Operasional: setiap hari, 07.00–21.00 WIB</span
-        ><span>{{
-          brand.whatsappUrl
-            ? "Diskusikan jadwal melalui WhatsApp."
-            : "WhatsApp resmi belum tersedia."
-        }}</span>
+        ><a
+          v-if="brand.whatsappUrl"
+          :href="brand.whatsappUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          >WhatsApp: {{ brand.whatsappDisplay
+          }}<span class="sr-only"> (buka tab baru)</span></a
+        ><span v-else>WhatsApp resmi belum tersedia.</span>
       </div>
     </div>
     <div class="container footer-legal">
@@ -81,7 +93,7 @@ import WhatsAppCTA from "../shared/WhatsAppCTA.vue";
 }
 .footer-cta p {
   color: color-mix(in srgb, var(--color-paper) 75%, transparent);
-  font-size: 13px;
+  font-size: 16px;
   max-width: 470px;
 }
 .footer-contact {
@@ -93,7 +105,7 @@ import WhatsAppCTA from "../shared/WhatsAppCTA.vue";
   z-index: 1;
 }
 .footer-contact span {
-  font-size: 10px;
+  font-size: 14px;
 }
 .footer-arrow {
   color: color-mix(in srgb, var(--color-paper) 14%, transparent);
@@ -104,23 +116,15 @@ import WhatsAppCTA from "../shared/WhatsAppCTA.vue";
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 32px;
-  font-size: 12px;
+  font-size: 15px;
 }
-.footer-brand .display {
-  font-size: 32px;
-}
-.footer-brand .display span {
-  font-family: var(--font-body);
-  font-size: 12px;
-  vertical-align: top;
-  margin-left: 4px;
+.footer-logo {
+  width: auto;
+  height: 96px;
+  object-fit: contain;
 }
 .footer-brand p {
   margin-top: 8px;
-}
-.footer-brand .small {
-  font-size: 10px;
-  opacity: 0.7;
 }
 .footer-bottom nav {
   display: grid;
@@ -148,7 +152,7 @@ import WhatsAppCTA from "../shared/WhatsAppCTA.vue";
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  font-size: 10px;
+  font-size: 14px;
   color: color-mix(in srgb, var(--color-paper) 70%, transparent);
 }
 @media (max-width: 1023px) {

@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from "vue";
-import { Check, Info } from "lucide-vue-next";
+import {
+  ArrowDown,
+  ArrowRight,
+  Check,
+  Info,
+  MousePointer2,
+} from "lucide-vue-next";
 import {
   packages,
   type CourseId,
@@ -58,31 +64,68 @@ async function moveTab(event: KeyboardEvent, index: number) {
       </div>
       <span class="course-symbol" aria-hidden="true">{{ program.symbol }}</span>
     </div>
-    <div
-      class="package-tabs"
-      role="tablist"
-      :aria-label="`Jenis paket ${program.name}`"
-    >
-      <button
-        v-for="(pack, index) in packages"
-        :key="pack.id"
-        :id="`${courseId}-tab-${pack.id}`"
-        type="button"
-        role="tab"
-        :aria-selected="selected === pack.id"
-        :tabindex="selected === pack.id ? 0 : -1"
-        :aria-controls="`${courseId}-prices`"
-        @click="selected = pack.id"
-        @keydown="moveTab($event, index)"
+    <div class="package-picker">
+      <div class="package-picker-heading">
+        <span class="package-picker-icon" aria-hidden="true"
+          ><MousePointer2 :size="22"
+        /></span>
+        <div>
+          <h3>Pilih paket belajar</h3>
+          <p :id="`${courseId}-package-help`">
+            Pilih salah satu paket untuk melihat rincian harga dan fasilitasnya.
+          </p>
+        </div>
+      </div>
+      <div
+        class="package-tabs"
+        role="tablist"
+        :aria-label="`Jenis paket ${program.name}`"
+        :aria-describedby="`${courseId}-package-help`"
       >
-        {{ pack.name
-        }}<span
-          >{{
-            pack.id === "single" ? "01" : pack.id === "routine" ? "08" : "04"
-          }}
-          sesi{{ pack.id === "single" ? " / fleksibel" : "" }}</span
+        <button
+          v-for="(pack, index) in packages"
+          :key="pack.id"
+          :id="`${courseId}-tab-${pack.id}`"
+          type="button"
+          role="tab"
+          :aria-selected="selected === pack.id"
+          :aria-labelledby="`${courseId}-label-${pack.id}`"
+          :aria-describedby="`${courseId}-sessions-${pack.id}`"
+          :tabindex="selected === pack.id ? 0 : -1"
+          :aria-controls="`${courseId}-prices`"
+          @click="selected = pack.id"
+          @keydown="moveTab($event, index)"
         >
-      </button>
+          <span class="package-tab-header">
+            <span>
+              <span
+                :id="`${courseId}-label-${pack.id}`"
+                class="package-tab-name"
+                >{{ pack.name }}</span
+              >
+              <span
+                :id="`${courseId}-sessions-${pack.id}`"
+                class="package-tab-sessions"
+                >{{ pack.sessionLabel }}</span
+              >
+            </span>
+            <span class="package-tab-indicator" aria-hidden="true"
+              ><Check v-if="selected === pack.id" :size="17"
+            /></span>
+          </span>
+          <span class="package-tab-action">
+            <span>{{
+              selected === pack.id ? "Sedang ditampilkan" : "Lihat rincian"
+            }}</span>
+            <ArrowDown
+              v-if="selected === pack.id"
+              :size="18"
+              aria-hidden="true"
+            />
+            <ArrowRight v-else :size="18" aria-hidden="true" />
+          </span>
+        </button>
+      </div>
     </div>
     <div
       :id="`${courseId}-prices`"
@@ -124,8 +167,9 @@ async function moveTab(event: KeyboardEvent, index: number) {
               <th scope="col">Jumlah<br />mahasiswa</th>
               <template v-if="selected !== 'practice'"
                 ><th v-for="column in columns" :key="column.label" scope="col">
-                  <span>{{ column.mode }}</span
-                  ><strong>{{ column.duration }} menit</strong>
+                  <span>{{ column.mode }}</span><strong
+                    >{{ column.duration }} menit</strong
+                  >
                 </th></template
               >
               <th v-else scope="col">
@@ -229,12 +273,12 @@ async function moveTab(event: KeyboardEvent, index: number) {
   margin: 10px 0 12px;
 }
 .program-heading p {
-  font-size: 13px;
+  font-size: 16px;
   max-width: 570px;
   color: var(--color-muted);
 }
 .program-heading .eyebrow {
-  font-size: 9px;
+  font-size: 14px;
 }
 .course-symbol {
   margin-left: auto;
@@ -244,34 +288,115 @@ async function moveTab(event: KeyboardEvent, index: number) {
   color: var(--color-ornament);
   white-space: nowrap;
 }
-.package-tabs {
-  display: flex;
+.package-picker {
+  padding: 24px;
   border: 1px solid var(--color-line);
-  border-bottom: 0;
   background: var(--color-warm);
+  margin-bottom: 20px;
+}
+.package-picker-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.package-picker-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+  border-radius: var(--radius);
+}
+.package-picker-heading h3 {
+  font: 700 20px/1.35 var(--font-body);
+  margin-bottom: 6px;
+}
+.package-picker-heading p {
+  color: var(--color-muted);
+  font-size: 16px;
+}
+.package-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
 }
 .package-tabs button {
-  flex: 1;
   min-width: 0;
   padding: 18px 20px;
   text-align: left;
-  border: 0;
-  border-bottom: 3px solid transparent;
-  background: transparent;
-  font-size: 14px;
-  font-weight: 600;
+  border: 2px solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-size: 16px;
+  color: var(--color-ink);
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    box-shadow 0.2s;
 }
-.package-tabs button span {
+.package-tabs button:hover {
+  border-color: var(--color-brand);
+  box-shadow: var(--shadow);
+}
+.package-tab-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.package-tab-name {
   display: block;
-  font-size: 10px;
-  font-weight: 400;
-  margin-top: 3px;
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+.package-tab-sessions {
+  display: block;
+  font-size: 15px;
+  margin-top: 6px;
   color: var(--color-muted);
+}
+.package-tab-indicator {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--color-line);
+  border-radius: 50%;
+  margin-top: 1px;
+}
+.package-tab-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--color-line);
+  padding-top: 12px;
+  margin-top: 16px;
+  color: var(--color-brand);
+  font-size: 14px;
+  font-weight: 700;
 }
 .package-tabs button[aria-selected="true"] {
   border-color: var(--color-brand);
-  color: var(--color-brand);
-  background: var(--color-surface);
+  color: var(--color-surface);
+  background: var(--color-brand);
+}
+.package-tabs button[aria-selected="true"] .package-tab-sessions {
+  color: var(--color-paper);
+}
+.package-tabs button[aria-selected="true"] .package-tab-indicator {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+.package-tabs button[aria-selected="true"] .package-tab-action {
+  border-color: color-mix(in srgb, var(--color-surface) 30%, transparent);
+  color: var(--color-surface);
 }
 .pricing-panel {
   border: 1px solid var(--color-line);
@@ -290,12 +415,12 @@ async function moveTab(event: KeyboardEvent, index: number) {
   text-transform: uppercase;
 }
 .table-intro p {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--color-muted);
   margin-top: 8px;
 }
 .table-intro .badge {
-  font-size: 9px;
+  font-size: 14px;
 }
 .table-scroll {
   overflow-x: auto;
@@ -306,7 +431,7 @@ table {
   width: 100%;
   min-width: 660px;
   font-variant-numeric: tabular-nums;
-  font-size: 13px;
+  font-size: 16px;
   text-align: left;
 }
 thead {
@@ -319,12 +444,12 @@ td {
 }
 thead th {
   font-weight: 500;
-  font-size: 12px;
+  font-size: 15px;
 }
 thead th span {
   display: block;
   text-transform: uppercase;
-  font-size: 9px;
+  font-size: 14px;
   letter-spacing: 0.08em;
   margin-bottom: 4px;
   opacity: 0.8;
@@ -341,7 +466,7 @@ tbody th {
   border-right: 1px solid var(--color-line);
 }
 tbody th span {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 400;
   color: var(--color-muted);
   margin-left: 6px;
@@ -360,7 +485,7 @@ tbody tr:last-child td {
   padding: 16px 28px;
   max-width: none;
   border-top: 1px solid var(--color-line);
-  font-size: 10px;
+  font-size: 14px;
   color: var(--color-muted);
 }
 .package-detail {
@@ -371,7 +496,7 @@ tbody tr:last-child td {
   gap: 32px;
 }
 .package-detail .eyebrow {
-  font-size: 9px;
+  font-size: 14px;
 }
 .package-detail ul {
   list-style: none;
@@ -384,7 +509,7 @@ tbody tr:last-child td {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 12px;
+  font-size: 15px;
 }
 .package-detail li svg {
   color: var(--color-success);
@@ -399,7 +524,7 @@ tbody tr:last-child td {
   gap: 20px;
 }
 .package-contact p {
-  font-size: 13px;
+  font-size: 16px;
   color: var(--color-muted);
 }
 .package-contact p strong {
@@ -410,7 +535,7 @@ tbody tr:last-child td {
   display: flex;
   gap: 10px;
   margin-top: 16px;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--color-muted);
 }
 .program-note svg {
@@ -438,12 +563,22 @@ tbody tr:last-child td {
     border-top: 1px solid var(--color-line);
     padding: 24px 0 0;
   }
-  .package-tabs button {
-    font-size: 12px;
-    padding: 14px 12px;
+  .package-picker {
+    padding: 20px;
   }
-  .package-tabs button span {
-    font-size: 9px;
+  .package-tabs {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .package-tabs button {
+    padding: 16px;
+  }
+  .package-tab-name {
+    font-size: 17px;
+  }
+  .package-tab-action {
+    padding-top: 10px;
+    margin-top: 12px;
   }
 }
 @media (max-width: 479px) {
@@ -457,14 +592,26 @@ tbody tr:last-child td {
     font-size: 42px;
   }
   .program-heading .eyebrow {
-    font-size: 8px;
+    font-size: 13px;
   }
-  .package-tabs button {
-    padding-inline: 8px;
-    font-size: 11px;
+  .package-picker {
+    padding: 16px;
+  }
+  .package-picker-heading {
+    gap: 10px;
+  }
+  .package-picker-heading h3 {
+    font-size: 18px;
+  }
+  .package-picker-heading p {
+    font-size: 15px;
+  }
+  .package-picker-icon {
+    width: 36px;
+    height: 36px;
   }
   .table-intro .badge {
-    font-size: 8px;
+    font-size: 13px;
   }
 }
 </style>

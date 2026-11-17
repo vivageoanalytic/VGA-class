@@ -135,7 +135,7 @@ function step(direction: number) {
   top: 14px;
   left: 14px;
   background: var(--color-paper);
-  font-size: 8px;
+  font-size: 13px;
 }
 .gallery-expand {
   position: absolute;
@@ -157,13 +157,13 @@ function step(direction: number) {
 .gallery-caption small {
   display: block;
   text-transform: uppercase;
-  font-size: 8px;
+  font-size: 13px;
   color: var(--color-muted);
   letter-spacing: 0.1em;
   margin-bottom: 6px;
 }
 .gallery-caption strong {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 500;
 }
 .gallery-caption > span:last-child {
@@ -234,7 +234,7 @@ function step(direction: number) {
     padding: 12px;
   }
   .lightbox-top .badge {
-    font-size: 8px;
+    font-size: 13px;
   }
 }
 </style>

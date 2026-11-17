@@ -27,6 +27,6 @@ export const faqs = [
   {
     question: "Bagaimana cara mulai les?",
     answer:
-      "Lihat program dan harga, cek gambaran jadwal, lalu hubungi admin melalui WhatsApp untuk mendiskusikan materi, durasi, lokasi, dan jumlah peserta. Kontak resmi akan diaktifkan setelah tersedia.",
+      "Lihat program dan harga, cek gambaran jadwal, lalu hubungi admin melalui tombol WhatsApp untuk mendiskusikan materi, durasi, lokasi, dan jumlah peserta.",
   },
 ];

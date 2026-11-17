@@ -1,9 +1,31 @@
 import { atWIB, OPEN_MINUTE, CLOSE_MINUTE, FRESH_MS } from "./dateTime.js";
-import type { PublicEvent, MentorSync } from "../types/schedule.js";
+import type {
+  PublicEvent,
+  MentorSync,
+  PublicSchedule,
+} from "../types/schedule.js";
 
 export interface Interval {
   start: number;
   end: number;
+}
+
+export function hasFreshSchedule(
+  schedule: PublicSchedule | null | undefined,
+  now = Date.now(),
+): boolean {
+  return (
+    !!schedule &&
+    hasFreshSync(
+      {
+        mentorId: "all",
+        syncStatus: schedule.syncStatus ?? "error",
+        updatedAt: schedule.updatedAt ?? null,
+        validUntil: schedule.validUntil,
+      },
+      now,
+    )
+  );
 }
 export interface PositionedEvent extends Interval {
   event: PublicEvent;
@@ -16,11 +38,15 @@ export function hasFreshSync(
   now = Date.now(),
 ): boolean {
   const updated = sync?.updatedAt ? Date.parse(sync.updatedAt) : NaN;
+  const expires = sync?.validUntil
+    ? Date.parse(sync.validUntil)
+    : updated + FRESH_MS;
   return (
     sync?.syncStatus === "success" &&
     Number.isFinite(updated) &&
     now >= updated &&
-    now - updated < FRESH_MS
+    Number.isFinite(expires) &&
+    now < expires
   );
 }
 

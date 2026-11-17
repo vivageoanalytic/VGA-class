@@ -206,7 +206,7 @@ const advantages = [
   margin-top: 16px;
 }
 .advantage-intro .eyebrow {
-  font-size: 8px;
+  font-size: 13px;
 }
 .advantage {
   border-left: 1px solid var(--color-line);
@@ -221,15 +221,15 @@ const advantages = [
 }
 .advantage-top span {
   color: var(--color-muted);
-  font-size: 9px;
+  font-size: 14px;
 }
 .advantage h3 {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   margin-bottom: 12px;
 }
 .advantage p {
-  font-size: 12px;
+  font-size: 15px;
   color: var(--color-muted);
   line-height: 1.8;
 }
@@ -258,7 +258,7 @@ const advantages = [
   height: 48px;
 }
 .program-number {
-  font-size: 9px;
+  font-size: 14px;
   letter-spacing: 0.13em;
   color: var(--color-muted);
 }
@@ -281,7 +281,7 @@ const advantages = [
   margin-bottom: 16px;
 }
 .program-card > p {
-  font-size: 12px;
+  font-size: 15px;
   color: var(--color-muted);
   max-width: 385px;
 }
@@ -294,7 +294,7 @@ const advantages = [
   list-style: none;
 }
 .topic-tags li {
-  font-size: 9px;
+  font-size: 14px;
   padding: 4px 9px;
   border: 1px solid var(--color-line);
   border-radius: 2px;
@@ -309,7 +309,7 @@ const advantages = [
 }
 .program-card-bottom > div > span {
   display: block;
-  font-size: 9px;
+  font-size: 14px;
   color: var(--color-muted);
 }
 .program-card-bottom strong {
@@ -321,7 +321,7 @@ const advantages = [
   font-weight: 600;
 }
 .program-card-bottom strong small {
-  font-size: 9px;
+  font-size: 14px;
   color: var(--color-muted);
   font-weight: 400;
 }
@@ -340,12 +340,12 @@ const advantages = [
 }
 .pricing-preview-note {
   margin-top: 20px;
-  font-size: 10px;
+  font-size: 14px;
   color: var(--color-muted);
   max-width: none;
 }
 .section-description {
-  font-size: 13px;
+  font-size: 16px;
   color: var(--color-muted);
   margin-top: -14px;
   margin-bottom: 30px;
@@ -362,7 +362,7 @@ const advantages = [
   font-size: 23px;
 }
 .home-mentors :deep(.mentor-content p) {
-  font-size: 9px;
+  font-size: 14px;
 }
 .home-mentors :deep(.mentor-index) {
   font-size: 65px;
@@ -371,7 +371,7 @@ const advantages = [
   background: var(--color-warm);
 }
 .gallery-note {
-  font-size: 10px;
+  font-size: 14px;
   color: var(--color-muted);
   margin-top: 25px;
 }
@@ -417,7 +417,7 @@ const advantages = [
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  font-size: 8px;
+  font-size: 13px;
   letter-spacing: 0.11em;
   color: var(--color-brand);
 }
@@ -427,13 +427,12 @@ const advantages = [
   margin-block: 20px 26px;
 }
 .about-copy h2 > span {
-  -webkit-text-stroke: 1px var(--color-brand);
-  color: transparent;
+  color: var(--color-brand);
 }
 .about-copy p {
   color: var(--color-muted);
   margin-bottom: 18px;
-  font-size: 13px;
+  font-size: 16px;
 }
 .about-copy .text-link {
   margin-top: 8px;
@@ -445,7 +444,7 @@ const advantages = [
 }
 .faq-section > div > p {
   margin-top: 22px;
-  font-size: 13px;
+  font-size: 16px;
 }
 .faq-decoration {
   display: block;

@@ -73,7 +73,7 @@ const filtered = computed(() =>
   padding: 10px 16px;
   background: transparent;
   border: 1px solid var(--color-line);
-  font-size: 12px;
+  font-size: 15px;
 }
 .gallery-toolbar button[aria-pressed="true"] {
   color: var(--color-surface);
@@ -86,7 +86,7 @@ const filtered = computed(() =>
   }
   .gallery-toolbar button {
     padding: 8px 10px;
-    font-size: 10px;
+    font-size: 14px;
   }
   .gallery-toolbar > span {
     white-space: nowrap;

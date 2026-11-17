@@ -59,7 +59,7 @@ const exampleITSPrice = getSingleSessionPrice("kalkulus-1", "offline", 90, 1)!;
   color: var(--color-brand);
   border: 1px solid var(--color-line);
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
 }
 .course-anchors a:hover {
   border-color: var(--color-brand);
@@ -82,7 +82,7 @@ const exampleITSPrice = getSingleSessionPrice("kalkulus-1", "offline", 90, 1)!;
     min-width: 0;
     padding: 12px;
     flex: 1;
-    font-size: 12px;
+    font-size: 15px;
     gap: 8px;
   }
   .course-anchors .display {

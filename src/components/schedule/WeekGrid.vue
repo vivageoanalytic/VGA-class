@@ -9,7 +9,7 @@ import {
   OPEN_MINUTE,
 } from "../../utils/dateTime";
 import { layoutDayEvents } from "../../utils/intervals";
-import { activeMentors } from "../../content/mentors";
+import { scheduleMentorMarker } from "../../utils/scheduleMentors";
 import type { PublicEvent } from "../../types/schedule";
 const props = defineProps<{
   weekStart: string;
@@ -24,11 +24,11 @@ const dayLayouts = computed(() =>
 );
 const gridColumns = computed(
   () =>
-    `64px ${dayLayouts.value.map((events) => `${Math.max(175, ...events.map((e) => e.columns * 95))}px`).join(" ")}`,
+    `76px ${dayLayouts.value.map((events) => `${Math.max(205, ...events.map((e) => e.columns * 132))}px`).join(" ")}`,
 );
+const HOUR_HEIGHT = 80;
 const hours = Array.from({ length: 15 }, (_, i) => i + 7);
-const mentorClass = (id: string) =>
-  activeMentors.find((m) => m.id === id)?.marker;
+const mentorClass = (id: string) => scheduleMentorMarker(id);
 </script>
 <template>
   <div
@@ -37,7 +37,13 @@ const mentorClass = (id: string) =>
     aria-label="Kalender mingguan, geser horizontal untuk melihat seluruh hari"
     tabindex="0"
   >
-    <div class="week-grid" :style="{ gridTemplateColumns: gridColumns }">
+    <div
+      class="week-grid"
+      :style="{
+        gridTemplateColumns: gridColumns,
+        '--hour-height': `${HOUR_HEIGHT}px`,
+      }"
+    >
       <div class="time-header">WIB<span>UTC+7</span></div>
       <div
         v-for="day in days"
@@ -45,8 +51,9 @@ const mentorClass = (id: string) =>
         class="day-header"
         :class="{ 'is-today': day === localDate() }"
       >
-        <span>{{ formatDay(day, { weekday: "short" }) }}</span
-        ><strong>{{ formatDay(day, { day: "2-digit" }) }}</strong
+        <span>{{ formatDay(day, { weekday: "short" }) }}</span><strong>{{
+          formatDay(day, { day: "2-digit" })
+        }}</strong
         ><small>{{ formatDay(day, { month: "short" }) }}</small
         ><span v-if="day === localDate()" class="sr-only">Hari ini</span>
       </div>
@@ -54,7 +61,7 @@ const mentorClass = (id: string) =>
         <span
           v-for="hour in hours"
           :key="hour"
-          :style="{ top: `${(hour - 7) * 64}px` }"
+          :style="{ top: `${(hour - 7) * HOUR_HEIGHT}px` }"
           >{{ minuteLabel(hour * 60) }}</span
         >
       </div>
@@ -71,7 +78,7 @@ const mentorClass = (id: string) =>
           v-for="hour in 14"
           :key="hour"
           class="hour-line"
-          :style="{ top: `${(hour - 1) * 64}px` }"
+          :style="{ top: `${(hour - 1) * HOUR_HEIGHT}px` }"
           aria-hidden="true"
         />
         <article
@@ -86,16 +93,18 @@ const mentorClass = (id: string) =>
             },
           ]"
           :style="{
-            top: `${((item.start - OPEN_MINUTE) / 60) * 64}px`,
-            height: `${((item.end - item.start) / 60) * 64}px`,
+            top: `${((item.start - OPEN_MINUTE) / 60) * HOUR_HEIGHT}px`,
+            height: `${((item.end - item.start) / 60) * HOUR_HEIGHT}px`,
             left: `calc(${(item.column / item.columns) * 100}% + 3px)`,
             width: `calc(${100 / item.columns}% - 6px)`,
           }"
         >
           <strong>{{ item.event.mentorDisplayName }}</strong><span
             class="event-time"
-            >{{ formatTime(item.event.start) }}–{{
-              formatTime(item.event.end)
+            >{{
+              item.event.allDay
+                ? "Seharian"
+                : `${formatTime(item.event.start)}–${formatTime(item.event.end)}`
             }}</span
           ><span class="event-label">{{
             item.event.publicLabel === "Sesi"
@@ -128,7 +137,7 @@ const mentorClass = (id: string) =>
   min-width: 1320px;
   display: grid;
   grid-template-columns: 64px repeat(7, minmax(175px, 1fr));
-  grid-template-rows: 88px 920px;
+  grid-template-rows: 100px calc(var(--hour-height) * 14 + 24px);
   position: relative;
 }
 .time-header,
@@ -142,14 +151,14 @@ const mentorClass = (id: string) =>
 .time-header {
   left: 0;
   z-index: 8;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
   text-align: center;
   padding-top: 23px;
 }
 .time-header span {
   display: block;
-  font-size: 8px;
+  font-size: 13px;
   font-weight: 400;
   color: var(--color-muted);
   margin-top: 3px;
@@ -167,7 +176,7 @@ const mentorClass = (id: string) =>
   width: 100%;
   text-align: center;
   text-transform: uppercase;
-  font-size: 9px;
+  font-size: 14px;
   letter-spacing: 0.09em;
   color: var(--color-muted);
 }
@@ -178,7 +187,7 @@ const mentorClass = (id: string) =>
   font-weight: 600;
 }
 .day-header small {
-  font-size: 10px;
+  font-size: 14px;
   color: var(--color-muted);
 }
 .day-header.is-today {
@@ -199,7 +208,7 @@ const mentorClass = (id: string) =>
   position: absolute;
   left: 9px;
   transform: translateY(-50%);
-  font-size: 10px;
+  font-size: 14px;
   color: var(--color-muted);
   font-variant-numeric: tabular-nums;
   background: var(--color-paper);
@@ -216,7 +225,7 @@ const mentorClass = (id: string) =>
 }
 .hour-line {
   position: absolute;
-  height: 64px;
+  height: var(--hour-height);
   width: 100%;
   border-bottom: 1px solid var(--color-line);
   background: linear-gradient(
@@ -235,26 +244,26 @@ const mentorClass = (id: string) =>
   display: flex;
   flex-direction: column;
   overflow: auto;
-  font-size: 10px;
+  font-size: 14px;
   line-height: 1.4;
   min-width: 0;
 }
 .calendar-event strong {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 700;
 }
 .event-time {
-  font-size: 9px;
+  font-size: 14px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   margin-top: 2px;
 }
 .event-label {
   margin-top: 4px;
-  font-size: 9px;
+  font-size: 14px;
 }
 .event-mode {
-  font-size: 8px;
+  font-size: 13px;
   margin-top: 2px;
 }
 .stale-event {
@@ -266,6 +275,6 @@ const mentorClass = (id: string) =>
 }
 .compact-event .event-label {
   margin-top: 1px;
-  font-size: 8px;
+  font-size: 13px;
 }
 </style>

@@ -10,16 +10,27 @@ describe("Interaksi tabel harga", () => {
       props: { courseId: "kalkulus-2" },
     });
     expect(wrapper.text()).toContain("Rp120.000");
+    expect(wrapper.find(".package-picker-heading").text()).toContain(
+      "Pilih paket belajar",
+    );
     const tabs = wrapper.findAll('[role="tab"]');
+    expect(tabs[0]!.text()).toContain("Sedang ditampilkan");
+    expect(tabs[1]!.text()).toContain("Lihat rincian");
     await tabs[1]!.trigger("click");
     expect(tabs[1]!.attributes("aria-selected")).toBe("true");
+    expect(tabs[1]!.text()).toContain("Sedang ditampilkan");
+    expect(tabs[0]!.text()).toContain("Lihat rincian");
     expect(wrapper.find("table").text()).toContain("Rp865.000");
     expect(wrapper.find('[role="tabpanel"]').text()).toContain("paket 8 sesi");
     await tabs[2]!.trigger("click");
     expect(wrapper.findAll("tbody tr")).toHaveLength(5);
     expect(wrapper.find("table").text()).not.toContain("90 menit");
     expect(wrapper.find("table").text()).toContain("Rp480.000");
-    expect(wrapper.find('a[href*="wa.me"]').exists()).toBe(false);
+    const contact = wrapper.find('a[href*="wa.me"]');
+    expect(contact.attributes("href")).toMatch(
+      /^https:\/\/wa\.me\/6285142296149\?/,
+    );
+    expect(contact.attributes("rel")).toBe("noopener noreferrer");
     wrapper.unmount();
   });
   it("Navigasi tab dengan keyboard mendukung arrow dan Home/End", async () => {

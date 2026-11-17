@@ -26,8 +26,15 @@
   --color-mentor-4-soft: #f6eedf;
   --color-mentor-5: #355b84;
   --color-mentor-5-soft: #e7eff8;
-  --font-body: "DM Sans", system-ui, sans-serif;
-  --font-heading: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-body: "Astoria", "Lato", system-ui, sans-serif;
+  --font-heading:
+    "Origin Super Condensed", "League Gothic Variable", "Arial Narrow",
+    sans-serif;
+  --text-caption: 0.875rem;
+  --text-small: 0.9375rem;
+  --text-body: 1rem;
+  --text-lead: 1.125rem;
+  --heading-tracking: 0.025em;
   --container: 1240px;
   --radius: 4px;
   --shadow: 0 16px 48px rgb(41 40 36 / 7%);

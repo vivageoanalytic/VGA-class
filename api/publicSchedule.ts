@@ -1,13 +1,15 @@
-import { activeMentors } from "../src/content/mentors.js";
 import {
   addDays,
   localDate,
   startOfWeek,
   validDate,
 } from "../src/utils/dateTime.js";
-import { createCalendarService } from "./googleCalendar.js";
+import type { PublicSchedule } from "../src/types/schedule.js";
+import { isScheduleMentorId } from "../src/utils/scheduleMentors.js";
 
-type Service = ReturnType<typeof createCalendarService>;
+type Service = {
+  getSchedule(weekStart: string, mentorId?: string): Promise<PublicSchedule>;
+};
 
 export function createRateLimiter(
   limit = 60,
@@ -59,6 +61,10 @@ export function createPublicScheduleHandler(
         { "Retry-After": "60" },
       );
     const url = new URL(request.url);
+    if (url.pathname !== "/api/public-schedule")
+      return error(404, "Endpoint tidak ditemukan.");
+    if (url.search.length > 256)
+      return error(400, "Parameter jadwal terlalu panjang.");
     if (
       [...url.searchParams.keys()].some(
         (key) => !["weekStart", "mentorId"].includes(key),
@@ -67,12 +73,9 @@ export function createPublicScheduleHandler(
       url.searchParams.getAll("mentorId").length > 1
     )
       return error(400, "Parameter jadwal tidak valid.");
-    const input = url.searchParams.get("weekStart") || "",
-      mentor = url.searchParams.get("mentorId") || "all";
-    if (
-      !validDate(input) ||
-      (mentor !== "all" && !activeMentors.some((m) => m.id === mentor))
-    )
+    const input = url.searchParams.get("weekStart") ?? "",
+      mentor = url.searchParams.get("mentorId") ?? "all";
+    if (!validDate(input) || (mentor !== "all" && !isScheduleMentorId(mentor)))
       return error(400, "Tanggal atau mentor tidak valid.");
     const weekStart = startOfWeek(input),
       current = startOfWeek(localDate(new Date(now())));

@@ -27,7 +27,7 @@ summary {
   align-items: center;
   gap: 22px;
   padding: 24px 0;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
 }
 summary::-webkit-details-marker {
@@ -35,7 +35,7 @@ summary::-webkit-details-marker {
 }
 .faq-number {
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 400;
 }
 .faq-plus {
@@ -50,11 +50,11 @@ details[open] .faq-plus {
 details p {
   margin: 0 35px 24px;
   color: var(--color-muted);
-  font-size: 14px;
+  font-size: 16px;
 }
 @media (max-width: 639px) {
   summary {
-    font-size: 13px;
+    font-size: 16px;
     gap: 14px;
     padding: 20px 0;
   }

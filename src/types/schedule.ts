@@ -8,11 +8,14 @@ export interface PublicEvent {
   course?: "Kalkulus 1" | "Kalkulus 2";
   mode?: "Online" | "Offline";
   availabilityStatus: "busy";
+  allDay?: boolean;
 }
 export interface MentorSync {
   mentorId: string;
   syncStatus: SyncStatus;
   updatedAt: string | null;
+  mentorDisplayName?: string;
+  validUntil?: string | null;
 }
 export interface PublicSchedule {
   weekStart: string;
@@ -20,4 +23,11 @@ export interface PublicSchedule {
   demo: boolean;
   events: PublicEvent[];
   mentors: MentorSync[];
+  source?: "apps-script";
+  syncStatus?: SyncStatus;
+  updatedAt?: string | null;
+  partial?: boolean;
+  revision?: string;
+  cacheMode?: "ttl" | "changes";
+  validUntil?: string | null;
 }

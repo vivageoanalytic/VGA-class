@@ -5,10 +5,13 @@ import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 await mkdir(resolve(root, "public/licenses"), { recursive: true });
-for (const font of ["barlow-condensed", "dm-sans"]) {
+for (const [font, packagePath] of [
+  ["lato", "@fontsource/lato"],
+  ["league-gothic", "@fontsource-variable/league-gothic"],
+]) {
   await writeFile(
     resolve(root, "public/licenses", `${font}-OFL.txt`),
-    await readFile(resolve(root, "node_modules/@fontsource", font, "LICENSE")),
+    await readFile(resolve(root, "node_modules", packagePath, "LICENSE")),
   );
 }
 const colors = {
@@ -77,8 +80,7 @@ for (const [i, drawing] of drawings.entries()) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="460" viewBox="0 0 640 460"><rect width="640" height="460" fill="${i === 1 ? "#e7e9d9" : c.paper}"/><path d="M0 460L640 0V460Z" fill="${c.brand}" opacity=".035"/>${drawing}</svg>`;
   await writeFile(resolve(root, "public/gallery", `demo-${i + 1}.svg`), svg);
 }
-const favicon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="8" fill="${c.brand}"/><text x="14" y="47" font-family="Georgia" font-style="italic" font-size="52" fill="${c.accent}">v.</text></svg>`;
-await writeFile(resolve(root, "public/favicon.svg"), favicon);
+await import("./create-brand-assets.mjs");
 await sharp(Buffer.from(graph(1, false)))
   .resize(1200, 630, { fit: "cover" })
   .composite([

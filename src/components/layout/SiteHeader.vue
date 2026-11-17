@@ -16,13 +16,17 @@ watch(
 <template>
   <header class="site-header" @keydown.esc="open = false">
     <div class="container header-inner">
-      <RouterLink to="/" class="wordmark" aria-label="VGA Class, beranda"
-        ><span class="brand-mark" aria-hidden="true">v.</span
-        ><span
-          >VGA<span class="wordmark-light">CLASS</span
-          ><small>LEARN. UNDERSTAND. GROW.</small></span
-        ></RouterLink
-      >
+      <RouterLink to="/" class="wordmark" aria-label="VGA Class, beranda">
+        <picture
+          ><source :srcset="brand.logo.src" type="image/webp" />
+          <img
+            class="brand-logo"
+            :src="brand.logo.fallback"
+            :alt="brand.logo.alt"
+            :width="brand.logo.width"
+            :height="brand.logo.height"
+        /></picture>
+      </RouterLink>
       <nav class="desktop-nav" aria-label="Navigasi utama">
         <RouterLink
           v-for="item in navigation"
@@ -107,38 +111,12 @@ watch(
 .wordmark {
   display: flex;
   align-items: center;
-  gap: 10px;
   flex-shrink: 0;
-  font-family: var(--font-heading);
-  font-size: 30px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0.01em;
 }
-.brand-mark {
-  font-family: Georgia, serif;
-  font-style: italic;
-  font-size: 38px;
-  color: var(--color-accent);
-  border: 1px solid currentColor;
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  line-height: 0.8;
-  padding-bottom: 4px;
-}
-.wordmark-light {
-  font-weight: 600;
-  margin-left: 4px;
-}
-.wordmark small {
-  display: block;
-  font-family: var(--font-body);
-  font-size: 6px;
-  font-weight: 500;
-  letter-spacing: 0.19em;
-  margin-top: 6px;
+.brand-logo {
+  width: auto;
+  height: 72px;
+  object-fit: contain;
 }
 .desktop-nav {
   display: flex;
@@ -149,8 +127,8 @@ watch(
   display: flex;
   align-items: center;
   position: relative;
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -172,7 +150,7 @@ watch(
   gap: 10px;
   border: 1px solid color-mix(in srgb, var(--color-surface) 40%, transparent);
   padding: 10px 12px;
-  font-size: 10px;
+  font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -195,7 +173,7 @@ watch(
   display: flex;
   justify-content: space-between;
   padding: 13px 0;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
 }
 .mobile-nav a[aria-current="page"] {
@@ -209,7 +187,7 @@ watch(
     display: none;
   }
 }
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .header-inner {
     height: 72px;
   }
@@ -219,13 +197,8 @@ watch(
   .mobile-toggle {
     display: block;
   }
-  .wordmark {
-    font-size: 27px;
-  }
-  .brand-mark {
-    width: 36px;
-    height: 36px;
-    font-size: 34px;
+  .brand-logo {
+    height: 58px;
   }
 }
 </style>

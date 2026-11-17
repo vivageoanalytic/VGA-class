@@ -1,1 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="8" fill="#640000"/><text x="14" y="47" font-family="Georgia" font-style="italic" font-size="52" fill="#dce790">v.</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1280"><title>VGA Class</title><rect width="1280" height="1280" rx="230" fill="#640000"/><svg x="54" y="290" width="1172" height="700" viewBox="30 210 1210 680"><defs>
+  <linearGradient id="gold" gradientUnits="userSpaceOnUse" x1="90" y1="1040" x2="1050" y2="275">
+    <stop offset="0" stop-color="#d7a85d"/>
+    <stop offset="0.35" stop-color="#e5b96f"/>
+    <stop offset="0.72" stop-color="#f5cf88"/>
+    <stop offset="1" stop-color="#e8b56b"/>
+  </linearGradient>
+</defs><g id="vga-monogram" fill="url(#gold)" fill-rule="evenodd">
+<path id="vga-shape-1-51" d="M51,273 L136,375 L330,743 L548,344 L450,343 L329,542 L186,273Z"/>
+<path id="vga-shape-2-108" d="M108,390 L108,628 L302,852 L749,852 L844,696 L986,696 L1053,811 L1091,813 L1222,856 L995,417 L940,319 L892,400 L777,609 L776,571 L804,519 L616,519 L557,604 L675,604 L636,680 L517,678 L517,592 L626,445 L818,445 L939,276 L1010,393 L1094,393 L958,233 L382,232 L465,311 L834,312 L805,352 L584,352 L537,419 L392,656 L392,764 L686,764 L672,790 L386,790 L350,832Z M883,614 L941,517 L1005,615Z"/>
+<path id="vga-shape-2-141" d="M141,723 L141,850 L254,851Z"/>
+</g></svg></svg>

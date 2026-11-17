@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 import {
   ArrowLeft,
   ArrowRight,
@@ -21,17 +22,60 @@ import {
   minuteLabel,
   startOfWeek,
 } from "../utils/dateTime";
-import { getFreeIntervals, hasFreshSync } from "../utils/intervals";
+import {
+  getFreeIntervals,
+  hasFreshSync,
+  hasFreshSchedule,
+} from "../utils/intervals";
+import {
+  isScheduleMentorId,
+  scheduleMentorMarker,
+} from "../utils/scheduleMentors";
 import WeekGrid from "../components/schedule/WeekGrid.vue";
 import WhatsAppCTA from "../components/shared/WhatsAppCTA.vue";
 const thisWeek = startOfWeek(localDate());
+const route = useRoute();
+const requestedMentor = () =>
+  typeof route.query.mentor === "string" &&
+  isScheduleMentorId(route.query.mentor)
+    ? (route.query.mentor as string)
+    : "all";
 const week = ref(thisWeek),
-  mentor = ref("all"),
+  mentor = ref(requestedMentor()),
   selectedDay = ref(localDate()),
   scenario = ref<DemoScenario>("success");
+watch(
+  () => route.query.mentor,
+  () => {
+    mentor.value = requestedMentor();
+  },
+);
 const { data, loading, error, now, reload } = useSchedule(week, scenario);
+const calendarMentors = computed(() =>
+  data.value?.source === "apps-script"
+    ? data.value.mentors.map((mentor) => ({
+        id: mentor.mentorId,
+        name: mentor.mentorDisplayName ?? "Mentor",
+        marker: scheduleMentorMarker(mentor.mentorId),
+      }))
+    : brand.demo
+      ? activeMentors
+      : activeMentors.filter(
+          (mentor) => mentor.publicationApproved && !mentor.demo,
+        ),
+);
+watch([calendarMentors, loading], ([mentors, busy]) => {
+  if (
+    !busy &&
+    mentor.value !== "all" &&
+    !mentors.some((item) => item.id === mentor.value)
+  )
+    mentor.value = "all";
+});
 const visibleMentors = computed(() =>
-  activeMentors.filter((m) => mentor.value === "all" || m.id === mentor.value),
+  calendarMentors.value.filter(
+    (m) => mentor.value === "all" || m.id === mentor.value,
+  ),
 );
 const visibleEvents = computed(() =>
   (data.value?.events ?? []).filter(
@@ -47,20 +91,18 @@ const unhealthy = computed(
   () =>
     !loading.value &&
     (error.value ||
-      visibleMentors.value.some(
-        (m) =>
-          !hasFreshSync(
-            syncs.value.find((s) => s.mentorId === m.id),
-            now.value,
-          ),
-      )),
+      (data.value?.source === "apps-script"
+        ? !hasFreshSchedule(data.value, now.value) || data.value.partial
+        : syncs.value.some((m) => !hasFreshSync(m, now.value)))),
 );
-const lastUpdated = computed(() =>
-  syncs.value
-    .map((s) => s.updatedAt)
-    .filter((v): v is string => !!v)
-    .sort()
-    .at(0),
+const lastUpdated = computed(
+  () =>
+    data.value?.updatedAt ??
+    syncs.value
+      .map((s) => s.updatedAt)
+      .filter((v): v is string => !!v)
+      .sort()
+      .at(0),
 );
 const staleMentorIds = computed(() =>
   syncs.value.filter((s) => !hasFreshSync(s, now.value)).map((s) => s.mentorId),
@@ -161,7 +203,7 @@ const earliest = addDays(thisWeek, -84),
         >
           Semua mentor</button
         ><button
-          v-for="m in activeMentors"
+          v-for="m in calendarMentors"
           :key="m.id"
           type="button"
           :class="m.marker"
@@ -193,9 +235,16 @@ const earliest = addDays(thisWeek, -84),
         ><div v-if="unhealthy" class="notice error-notice" role="status">
           <AlertCircle :size="18" aria-hidden="true" />
           <p>
-            <strong>Data belum dapat diperbarui.</strong> Status mentor yang
-            gagal atau kedaluwarsa <strong>belum diketahui</strong>. Rentang
-            kosongnya belum dapat dinyatakan tersedia.
+            <template v-if="data?.partial"
+              ><strong>Sebagian jadwal belum lengkap.</strong> Jadwal yang
+              berhasil dibaca tetap ditampilkan. Ketersediaan perlu dikonfirmasi
+              ke admin.</template
+            >
+            <template v-else
+              ><strong>Data belum dapat diperbarui.</strong> Status mentor yang
+              gagal atau kedaluwarsa <strong>belum diketahui</strong>. Rentang
+              kosongnya belum dapat dinyatakan tersedia.</template
+            >
           </p>
           <button type="button" class="retry-button" @click="reload">
             Coba lagi
@@ -236,6 +285,13 @@ const earliest = addDays(thisWeek, -84),
         >
       </div>
       <div class="availability-list" aria-live="polite">
+        <p v-if="!loading && !visibleMentors.length" class="muted">
+          {{
+            unhealthy
+              ? "Status jadwal mentor belum diketahui. Coba perbarui jadwal atau hubungi admin."
+              : "Belum ada mentor dengan jadwal tercatat pada minggu ini. Hubungi admin untuk informasi ketersediaan."
+          }}
+        </p>
         <div
           v-for="m in visibleMentors"
           :key="m.id"
@@ -289,7 +345,7 @@ const earliest = addDays(thisWeek, -84),
   align-items: center;
   gap: 16px;
   margin-top: 14px;
-  font-size: 11px;
+  font-size: 14px;
 }
 select {
   background: var(--color-surface);
@@ -297,7 +353,7 @@ select {
   border-radius: 2px;
   color: var(--color-ink);
   padding: 8px 12px;
-  font-size: 12px;
+  font-size: 15px;
   max-width: 100%;
 }
 .calendar-toolbar {
@@ -324,7 +380,7 @@ select {
   padding: 8px 15px;
   border: 1px solid var(--color-line);
   background: var(--color-surface);
-  font-size: 12px;
+  font-size: 15px;
 }
 .today-button:disabled,
 .icon-button:disabled {
@@ -344,7 +400,7 @@ select {
   background: var(--color-surface);
   padding: 8px 12px;
   border: 1px solid var(--color-line);
-  font-size: 10px;
+  font-size: 14px;
 }
 .mentor-filter button[aria-pressed="true"] {
   background: var(--color-brand);
@@ -366,7 +422,7 @@ select {
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  font-size: 10px;
+  font-size: 14px;
   color: var(--color-muted);
   margin-block: 20px 14px;
 }
@@ -377,7 +433,7 @@ select {
 }
 .calendar-hint {
   margin-top: 12px;
-  font-size: 10px;
+  font-size: 14px;
   color: var(--color-muted);
 }
 .calendar-loading {
@@ -405,7 +461,7 @@ select {
   border: 1px solid currentColor;
   background: transparent;
   white-space: nowrap;
-  font-size: 11px;
+  font-size: 14px;
 }
 .availability-section {
   margin-top: 44px;
@@ -421,7 +477,7 @@ select {
   margin-bottom: 24px;
 }
 .availability-heading .eyebrow {
-  font-size: 9px;
+  font-size: 14px;
 }
 .availability-heading h2 {
   font-size: 31px;
@@ -432,7 +488,7 @@ select {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 11px;
+  font-size: 14px;
 }
 .availability-row {
   display: flex;
@@ -440,7 +496,7 @@ select {
   align-items: baseline;
   padding-block: 16px;
   border-top: 1px solid var(--color-line);
-  font-size: 12px;
+  font-size: 15px;
 }
 .availability-mentor {
   display: flex;
@@ -451,7 +507,7 @@ select {
 }
 .availability-mentor small {
   color: var(--color-muted);
-  font-size: 9px;
+  font-size: 14px;
   font-weight: 400;
 }
 .unknown-status {
@@ -467,11 +523,11 @@ select {
   background: var(--color-success-soft);
   color: var(--color-success);
   padding: 3px 8px;
-  font-size: 10px;
+  font-size: 14px;
   font-variant-numeric: tabular-nums;
 }
 .free-intervals small {
-  font-size: 9px;
+  font-size: 14px;
   color: var(--color-muted);
 }
 .availability-note {
@@ -479,7 +535,7 @@ select {
   display: flex;
   gap: 10px;
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 14px;
 }
 .availability-note svg {
   margin-top: 2px;
