@@ -22,7 +22,7 @@
   "dependencies": {
     "@fontsource-variable/league-gothic": "^5.3.0",
     "@fontsource/lato": "^5.3.0",
-    "lucide-vue-next": "^0.468.0",
+    "lucide-vue-next": "^1.0.0",
     "vue": "^3.5.24",
     "vue-router": "^4.6.3"
   },
