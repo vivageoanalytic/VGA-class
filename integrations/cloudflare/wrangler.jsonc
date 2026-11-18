@@ -1,0 +1,20 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "vga-class-calendar",
+  "main": "calendar-worker.ts",
+  "compatibility_date": "2026-11-18",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "vars": {
+    "CALENDAR_CACHE_MODE": "ttl",
+  },
+  "durable_objects": {
+    "bindings": [
+      { "name": "CALENDAR_COORDINATOR", "class_name": "CalendarCoordinator" },
+    ],
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["CalendarCoordinator"] },
+  ],
+}

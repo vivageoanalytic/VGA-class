@@ -2,6 +2,8 @@
 
 Cache browser dan backend sudah tersedia. Format JSON serta `doPost` Apps Script yang sedang dipakai tetap sama.
 
+Untuk **Cloudflare Pages**, adapter/cache bersama sekarang tersedia pada source. Panduan pemasangan Worker privat, secret dan binding: [CLOUDFLARE_PAGES.md](CLOUDFLARE_PAGES.md). Bagian backend Node di bawah tetap berlaku untuk development lokal atau hosting Node.
+
 ## Cara kerja
 
 - Beranda dan halaman jadwal berbagi cache di memori serta `sessionStorage`. Bolak-balik halaman atau memuat ulang tab selama cache berlaku tidak mengambil data sumber lagi. Request bersamaan untuk minggu yang sama digabung.
@@ -9,7 +11,7 @@ Cache browser dan backend sudah tersedia. Format JSON serta `doPost` Apps Script
 - Mode `changes` mempertahankan hasil sampai ada notifikasi perubahan kalender. Notifikasi membatalkan cache, lalu pembaca berikutnya mengambil hasil baru. Halaman yang sedang terbuka menerima pemberitahuan melalui SSE dan memperbarui jadwal.
 - Mode `changes` memiliki batas cadangan **6 jam** jika notifikasi terlewat. Bila koneksi SSE terputus, browser memeriksa backend maksimal setiap menit; backend tetap memakai cache sumber yang sama.
 - Tombol **Perbarui jadwal** memeriksa backend dengan melewati cache browser. Tombol ini tidak memaksa request Google untuk setiap klik.
-- Pembacaan pertama, minggu yang belum tersimpan, restart backend, cache kedaluwarsa atau perubahan kalender tetap dapat memerlukan request Apps Script. Cache backend berada di memori, bukan penyimpanan permanen. Setiap instance backend mempunyai cache sendiri.
+- Pembacaan pertama, minggu yang belum tersimpan, cache kedaluwarsa atau perubahan kalender tetap dapat memerlukan request Apps Script. Pada Node lokal, cache berada di memori tiap proses dan restart dapat memerlukan pembacaan ulang. Pada adapter Cloudflare, satu Durable Object membagi cache antar-lokasi dan menyimpan data publik di SQLite agar tetap tersedia setelah eviction/restart.
 
 Data kosong dari sumber yang berhasil berarti mentor tersedia pada jam operasional. Kegagalan sinkronisasi tetap berstatus stale/error; cache tidak mengubahnya menjadi waktu bebas. Waktu pembaruan menunjukkan fetch sumber yang sebenarnya, bukan waktu membuka halaman.
 

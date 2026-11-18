@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "vga-class",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-11-18",
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CALENDAR_COORDINATOR",
+        "class_name": "CalendarCoordinator",
+        "script_name": "vga-class-calendar",
+      },
+    ],
+  },
+}

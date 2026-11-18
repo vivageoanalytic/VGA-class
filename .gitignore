@@ -1,5 +1,7 @@
 node_modules/
 .npm-cache/
+.wrangler/
+**/.wrangler/
 dist/
 dist-server/
 .env

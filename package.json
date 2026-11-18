@@ -9,7 +9,11 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "dev:api": "tsc -p tsconfig.server.json && node --watch --env-file-if-exists=.env dist-server/api/server.js",
-    "build": "vue-tsc --noEmit && vite build && node --experimental-strip-types scripts/create-seo.ts && tsc -p tsconfig.server.json && npm run security:check",
+    "build": "vue-tsc --noEmit && tsc -p tsconfig.cloudflare.json && vite build && node --experimental-strip-types scripts/create-seo.ts && node --experimental-strip-types scripts/create-cloudflare-headers.ts && tsc -p tsconfig.server.json && npm run security:check",
+    "build:calendar": "node scripts/build-cloudflare-calendar.mjs",
+    "deploy:calendar": "wrangler deploy --config integrations/cloudflare/wrangler.jsonc",
+    "setup:calendar": "node --experimental-strip-types scripts/setup-cloudflare-calendar.ts",
+    "test:cloudflare": "npm run build:calendar && vitest run --config vitest.cloudflare.config.ts",
     "preview": "vite preview --host 127.0.0.1",
     "start": "node --env-file-if-exists=.env dist-server/api/server.js",
     "test": "vitest run",
@@ -36,18 +40,21 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
+    "@cloudflare/workers-types": "5.20261118.1",
     "@playwright/test": "^1.56.1",
     "@tailwindcss/vite": "^4.1.17",
     "@types/node": "^24.10.0",
     "@vitejs/plugin-vue": "^6.0.2",
     "@vue/test-utils": "2.4.6",
     "jsdom": "^27.2.0",
+    "miniflare": "5.20261117.0-beta",
     "prettier": "^3.10.1",
     "sharp": "0.35.5",
     "tailwindcss": "^4.1.17",
     "typescript": "~5.9.3",
     "vite": "^7.2.2",
     "vitest": "^4.0.8",
-    "vue-tsc": "^3.1.4"
+    "vue-tsc": "^3.1.4",
+    "wrangler": "4.164.0"
   }
 }

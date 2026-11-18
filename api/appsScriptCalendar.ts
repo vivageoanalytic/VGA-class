@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { activeMentors } from "../src/content/mentors.js";
-import { addDays, atWIB, FRESH_MS } from "../src/utils/dateTime.js";
+import { addDays, atWIB, FRESH_MS, validDate } from "../src/utils/dateTime.js";
 import { validMentorLabel } from "../src/utils/scheduleMentors.js";
 import type {
   MentorSync,
@@ -18,6 +18,7 @@ export interface AppsScriptDependencies {
   fetcher?: typeof fetch;
   now?: () => number;
   onSyncError?: (publicMentorId: string) => void;
+  initialState?: AppsScriptState;
 }
 
 export function readAppsScriptConfig(
@@ -91,13 +92,21 @@ async function readPayload(response: Response): Promise<unknown> {
   }
 }
 
-interface CalendarMentor {
+export interface CalendarMentor {
   id: string;
   name: string;
 }
-interface Snapshot {
+export interface Snapshot {
   data: PublicSchedule;
   expires: number;
+}
+
+/** Contains only sanitized public data; credentials and Google calendar/event IDs are excluded. */
+export interface AppsScriptState {
+  version: 1;
+  revision: string;
+  mentors: CalendarMentor[];
+  snapshots: Array<{ weekStart: string; snapshot: Snapshot }>;
 }
 
 /** Accepts the owner's existing success/timezone/count/schedules/warnings JSON unchanged. */
@@ -111,10 +120,42 @@ export function createAppsScriptCalendarService(
     pending = new Map<string, Promise<Snapshot>>();
   const knownMentors = new Map<string, CalendarMentor>();
   const listeners = new Set<(revision: string) => void>();
-  let revision = randomUUID();
+  let revision: string = randomUUID();
+  let stateVersion = 0;
   const cacheMode = config.cacheMode ?? "ttl";
   // Change notifications invalidate this early; a six-hour fallback also recovers missed notifications.
   const cacheMs = cacheMode === "changes" ? 6 * 60 * 60_000 : FRESH_MS;
+
+  const initial = dependencies.initialState;
+  if (
+    initial?.version === 1 &&
+    /^[a-f0-9-]{36}$/.test(initial.revision) &&
+    Array.isArray(initial.mentors) &&
+    Array.isArray(initial.snapshots)
+  ) {
+    revision = initial.revision;
+    for (const mentor of initial.mentors.slice(0, 64))
+      if (
+        mentor &&
+        typeof mentor.id === "string" &&
+        validMentorLabel(mentor.name)
+      )
+        knownMentors.set(mentor.id, mentor);
+    for (const { weekStart, snapshot } of initial.snapshots.slice(0, 64))
+      if (
+        validDate(weekStart) &&
+        snapshot &&
+        snapshot.data &&
+        Number.isFinite(snapshot.expires) &&
+        snapshot.data.weekStart === weekStart &&
+        snapshot.data.source === "apps-script" &&
+        snapshot.data.demo === false &&
+        snapshot.data.timeZone === "Asia/Jakarta" &&
+        Array.isArray(snapshot.data.events) &&
+        Array.isArray(snapshot.data.mentors)
+      )
+        cache.set(weekStart, snapshot);
+  }
 
   function calendarMentor(name: string): CalendarMentor {
     const clean = name.trim().normalize("NFKC");
@@ -300,11 +341,24 @@ export function createAppsScriptCalendarService(
         (data.syncStatus === "success" && !data.partial ? cacheMs : 15_000),
     };
     if (cache.size >= 64) cache.delete(cache.keys().next().value!);
-    if (revision === requestRevision) cache.set(weekStart, snapshot);
+    if (revision === requestRevision) {
+      cache.set(weekStart, snapshot);
+      stateVersion++;
+    }
     return snapshot;
   }
 
   return {
+    getStateVersion: () => stateVersion,
+    exportState: (): AppsScriptState => ({
+      version: 1,
+      revision,
+      mentors: [...knownMentors.values()],
+      snapshots: [...cache].map(([weekStart, snapshot]) => ({
+        weekStart,
+        snapshot,
+      })),
+    }),
     getRevision: () => revision,
     subscribe(listener: (next: string) => void) {
       listeners.add(listener);
@@ -314,6 +368,7 @@ export function createAppsScriptCalendarService(
     },
     invalidate() {
       revision = randomUUID();
+      stateVersion++;
       for (const snapshot of cache.values()) snapshot.expires = 0;
       pending.clear();
       for (const listener of listeners) {

@@ -28,5 +28,6 @@ jobs:
       - run: npm audit --audit-level=high
       - run: npm test
       - run: npm run build
+      - run: npm run test:cloudflare
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e

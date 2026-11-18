@@ -19,6 +19,8 @@ Perubahan lokal mencakup validasi URL/CV dan query, whitelist static path + real
 
 ## 0. Tujuan dan ruang lingkup
 
+**Adapter Cloudflare — 18 November 2026:** Pages Functions dan Worker privat/SQLite Durable Object kini tersedia sebagai source untuk domain `vga-class.pages.dev`. Cache publik, katalog mentor, revisi dan deduplikasi dibagi antar-lokasi serta dipertahankan setelah eviction. Secret berada pada Worker; callback hanya menerima UUID/bearer dan tidak menulis event Google. Script setup dijalankan eksplisit oleh pemilik dan mengirim secret dari `.env` melalui stdin, tanpa mencetak nilai. Runtime dan build diuji lokal; pemasangan Worker/secret/binding pada akun pemilik serta trigger nyata belum diverifikasi. Lihat [panduan Cloudflare](docs/CLOUDFLARE_PAGES.md) dan [laporan audit](SECURITY_AUDIT_REPORT.md).
+
 Tujuan keamanan:
 
 1. Mengurangi risiko situs **VGA Class** berubah menjadi konten judi online/judol, spam SEO, tautan penipuan, atau konten lain akibat _defacement_, kebocoran akun, atau celah kode.

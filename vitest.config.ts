@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [vue()],
   test: {
     include: ["tests/**/*.test.ts"],
+    exclude: ["tests/cloudflare/**"],
     environment: "node",
     restoreMocks: true,
   },

@@ -1,6 +1,6 @@
 # VGA Class
 
-Website promosi les Kalkulus 1 dan Kalkulus 2 sesuai `PRD.md` dan `IMPLEMENTATION_PLAN.md`. Vue 3, TypeScript, Vite, Tailwind CSS, Vue Router, serta backend Node.js read-only. Tidak menggunakan database.
+Website promosi les Kalkulus 1 dan Kalkulus 2 sesuai `PRD.md` dan `IMPLEMENTATION_PLAN.md`. Vue 3, TypeScript, Vite, Tailwind CSS, Vue Router, serta backend kalender read-only untuk Node.js dan Cloudflare. Data siswa tidak disimpan; SQLite Durable Object Cloudflare dipakai khusus untuk cache jadwal publik.
 
 ## Menjalankan lokal
 
@@ -121,6 +121,8 @@ Rate limit bawaan 60 request/menit/IP, timeout Google, cache terbatas, dan secur
 
 ## Build produksi dan hosting
 
+Untuk domain Cloudflare Pages yang sudah dipakai (`vga-class.pages.dev`), backend kalender memakai Pages Functions dan satu SQLite Durable Object agar cache dibagi antar-lokasi serta bertahan setelah isolate diganti. Pasang Worker privat dengan `npx wrangler login` lalu `npm run setup:calendar` **sebelum push source Pages**. Script tersebut mengunggah tiga secret server dari `.env` lewat stdin, tanpa mencetak nilainya; build/CI tidak menjalankannya. Petunjuk lengkap: [docs/CLOUDFLARE_PAGES.md](docs/CLOUDFLARE_PAGES.md). URL webhook tetap `https://vga-class.pages.dev/api/calendar-changed`. Source sudah tersedia; deployment akun pemilik dan callback Google nyata masih perlu diverifikasi.
+
 ```powershell
 npm ci
 npm run build
@@ -135,7 +137,7 @@ Prototipe default **noindex** dan sitemap kosong. Setelah konten resmi, persetuj
 
 ## Batas kesiapan rilis
 
-Logo dan WhatsApp resmi sudah terpasang. Identitas/foto mentor, banner dan dokumentasi resmi, izin publikasi, lokasi/fasilitas, credentials kalender, domain dan hosting masih diperlukan. Tidak ada testimoni rekaan. Situs belum dipublikasikan. Rincian verifikasi dan status fase ada di `IMPLEMENTATION_STATUS.md`.
+Logo dan WhatsApp resmi sudah terpasang; pemilik telah memublikasikan frontend di Cloudflare Pages. Identitas/foto mentor, banner dan dokumentasi resmi, izin publikasi, lokasi/fasilitas, serta pemasangan secret/backend Cloudflare dan pengujian kalender produksi masih diperlukan untuk rilis lengkap. Tidak ada testimoni rekaan. Rincian verifikasi dan status fase ada di `IMPLEMENTATION_STATUS.md`.
 
 Font League Gothic dan Lato di-host sendiri dengan SIL Open Font License; salinan lisensi ada di `public/licenses/`. SVG ilustrasi dan sumber PNG demo dibuat orisinal melalui `scripts/create-assets.mjs`; tidak memakai aset MPL ID. Ikon menggunakan Lucide (ISC).
 

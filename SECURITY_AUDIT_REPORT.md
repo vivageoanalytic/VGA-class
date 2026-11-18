@@ -2,7 +2,17 @@
 
 Tanggal audit: 16 November 2026 (WIB). Cakupan: source lokal dan hasil build; bukan audit akun/provider atau uji penetrasi produksi. Baseline sebelum perubahan: commit `f138150`.
 
-## Kompatibilitas instalasi Cloudflare — 18 November 2026
+## Backend Cloudflare dan cache bersama — 18 November 2026
+
+Adapter Pages Functions baru meneruskan hanya tiga route kalender ke satu Durable Object SQLite pada Worker privat. Identitas objek sama untuk semua lokasi, sehingga notifikasi membatalkan cache yang dibaca seluruh pengunjung. Katalog mentor, snapshot publik, revisi dan deduplikasi callback dipersistenkan; token, Calendar/event ID, judul asli dan metadata privat tidak disimpan dalam cache. Hash konfigurasi memisahkan cache ketika URL/token/mode berubah. Interval kosong tetap gagal tertutup ketika sinkronisasi gagal.
+
+Webhook menerima hanya UUID, autentikasi bearer dengan secret terpisah, batas body 4 KiB, rate limit dan perbandingan hash konstan. Callback disimpan sebelum respons sukses. SSE hanya mengirim revisi; stream lambat diputus untuk membatasi antrean. Worker tidak memiliki URL `workers.dev` publik; akses melalui binding Pages. API menjaga method/status/header dan tidak mengubah event Google. Static Pages memperoleh `_headers` dari policy yang sama dengan Node.
+
+Script `setup:calendar` dijalankan eksplisit oleh pemilik untuk memasang Worker dan tiga secret server dari `.env` ke akun Cloudflare yang dipilih. Nilai secret memakai stdin, tanpa shell/interpolasi argumen, file sementara atau log nilai. Script ini tidak dijalankan oleh build/CI dan belum dijalankan ke akun produksi pada pekerjaan lokal ini. Panduan: [docs/CLOUDFLARE_PAGES.md](docs/CLOUDFLARE_PAGES.md). Advisori picomatch yang disebut di bawah tetap terpisah dan belum diabaikan.
+
+Verifikasi: **315 unit/komponen, 7 tes runtime workerd/SQLite dan 19 tes browser lulus**; build produksi/TypeScript/security gate dan bundling Pages Functions/Worker dry-run lulus. Tes runtime meliputi pembacaan paralel, persistensi setelah eviction, invalidasi sebelum eviction, deduplikasi persisten, fail-closed/stale dan SSE. Setup diuji dengan mock, tanpa deployment atau pengiriman secret produksi. Validasi lockfile npm 10 tetap lulus. Audit terkini masih 7 high, semuanya terkait picomatch dan alat build/test seperti pada catatan di bawah.
+
+## Hasil perbaikan instalasi npm 10 — 18 November 2026
 
 Build commit `f66124f` gagal sebelum kompilasi karena npm 10 menolak lockfile dengan override bertingkat `js-beautify > editorconfig > minimatch`. Kegagalan yang sama direproduksi pada npm 10.9.9. Override `editorconfig > minimatch` kini didefinisikan langsung pada parent paket tersebut; versi glob/minimatch dipertahankan. Lockfile diserialisasi ulang dengan npm 10, dan CI menggunakan Node 22 agar memeriksa target instalasi Cloudflare.
 
