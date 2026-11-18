@@ -149,4 +149,6 @@ CI dan Dependabot disiapkan di `.github/`; workflow tidak melakukan deployment a
 
 Dependency dev formatter memiliki override terbatas: `js-beautify` memakai glob 14.0.2 dan editorconfig memakai minimatch 11.0.1, untuk menutup advisori yang belum dipenuhi rentang dependency lamanya. `@vue/test-utils` dipin 2.4.6 dan sharp 0.35.5. Kompatibilitas formatter CLI, render SVG/PNG, tes unit/komponen dan browser telah diperiksa; review ulang override ketika upstream telah memperbarui rentang versinya.
 
+Override `editorconfig` didefinisikan langsung pada paket tersebut agar `npm ci` konsisten pada npm 10 (Cloudflare Pages) maupun npm 11. CI menggunakan Node 22 untuk memeriksa instalasi sesuai target Cloudflare. Jika build lama gagal dengan `minimatch ... does not satisfy`, push perubahan `package.json` beserta `package-lock.json`, lalu deploy commit terbaru; menjalankan ulang commit lama tetap memakai konfigurasi lama. Pertahankan Build command `npm run build` dan output `dist`.
+
 Referensi teknis: [Calendar events.list](https://developers.google.com/workspace/calendar/api/v3/reference/events/list), [Calendar OAuth scopes](https://developers.google.com/workspace/calendar/api/auth), [Vite](https://vite.dev/guide/). Referensi komposisi: [repo MPL ID](https://github.com/Riswan-Nopiyar/mpl-id-mobile-legends).

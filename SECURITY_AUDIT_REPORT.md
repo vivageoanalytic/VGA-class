@@ -2,6 +2,14 @@
 
 Tanggal audit: 16 November 2026 (WIB). Cakupan: source lokal dan hasil build; bukan audit akun/provider atau uji penetrasi produksi. Baseline sebelum perubahan: commit `f138150`.
 
+## Kompatibilitas instalasi Cloudflare — 18 November 2026
+
+Build commit `f66124f` gagal sebelum kompilasi karena npm 10 menolak lockfile dengan override bertingkat `js-beautify > editorconfig > minimatch`. Kegagalan yang sama direproduksi pada npm 10.9.9. Override `editorconfig > minimatch` kini didefinisikan langsung pada parent paket tersebut; versi glob/minimatch dipertahankan. Lockfile diserialisasi ulang dengan npm 10, dan CI menggunakan Node 22 agar memeriksa target instalasi Cloudflare.
+
+Verifikasi terisolasi pada Windows: instalasi bersih Node 22.23.5/npm 10.9.9 berhasil, **301 tes unit/komponen lulus**, serta build produksi/TypeScript/security gate lulus tanpa `.env` lokal. Instalasi `node_modules` utama tetap dipertahankan. Build aktual Cloudflare dari commit perbaikan belum dijalankan.
+
+Audit dependency terbaru mendeteksi **7 temuan high** yang berasal dari satu advisori picomatch melalui alat build/test (Vite, Vitest dan Vue language tools). [GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf), diperbarui 17 November 2026, mencakup picomatch sampai 4.0.7; registry dan advisori belum menyediakan versi patch saat pemeriksaan. Ini terpisah dari error lockfile. Gate `npm audit --audit-level=high` tetap aktif dan saat ini gagal; tidak dilakukan downgrade framework atau pengabaian advisori. Hasil audit 0 pada catatan 16 November di bawah merupakan hasil historis, bukan status audit terbaru.
+
 ## Integrasi JSON Apps Script asli ? 17 November 2026
 
 Backend menerima success, timezone, count, schedules, warnings milik pemilik. Setiap sesi dibaca dari mentor/title/start/end/allDay tanpa syarat versi, ID/status mentor atau echo rentang tambahan. Nama kalender menjadi label publik yang memang dikirim API; website membuat ID stabil dan timestamp penerimaan sendiri. Calendar ID dan token tidak diteruskan ke browser.
